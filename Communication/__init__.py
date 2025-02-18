@@ -68,7 +68,7 @@ class Communication:
     tries = 0
 
     while tries < 1000:
-      self.sock.sendto(DISCOVER_MESSAGE + RANDOM_ID, ('<broadcast>', DISCOVERY_PORT))
+      self.sock.sendto(DISCOVER_MESSAGE + RANDOM_ID, (socket.SO_BROADCAST, DISCOVERY_PORT))
 
       try:
         data, addr = self.sock.recvfrom(1024)
