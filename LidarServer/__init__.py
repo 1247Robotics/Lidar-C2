@@ -7,8 +7,8 @@ from queue import Queue
 from cachetools import TTLCache
 import threading
 
-DISCOVERY_PORT = 80
-OPERATING_PORT = 443
+DISCOVERY_PORT = 5556
+OPERATING_PORT = 5557
 DISCOVER_MESSAGE = b"LIDAR_DISCOVERY"
 
 #RANDOM_ID = random.randint(0, 0xFFFFFFFF).to_bytes(4, byteorder='big')
