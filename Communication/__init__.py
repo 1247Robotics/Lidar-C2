@@ -177,3 +177,5 @@ class Communication:
   '''
   def get_nowait(self):
     return self.messageQueue.get_nowait()
+    
+Communication()
