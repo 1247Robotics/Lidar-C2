@@ -64,11 +64,13 @@ class Communication:
 
   def discover_c2(self):
     self.sock.settimeout(5)
+    self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # Enable broadcast
+
 
     tries = 0
 
-    while tries < 1000:
-      self.sock.sendto(DISCOVER_MESSAGE + RANDOM_ID, (socket.SO_BROADCAST, DISCOVERY_PORT))
+    while tries < 36:
+      self.sock.sendto(DISCOVER_MESSAGE + RANDOM_ID, ('<broadcast>', DISCOVERY_PORT))
 
       try:
         data, addr = self.sock.recvfrom(1024)
