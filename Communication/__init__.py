@@ -71,7 +71,7 @@ class Communication:
 
     tries = 0
 
-    while tries < 1000:
+    while True:
       self.discovery_sock.sendto(DISCOVER_MESSAGE + RANDOM_ID, ('<broadcast>', DISCOVERY_PORT))
 
       try:
