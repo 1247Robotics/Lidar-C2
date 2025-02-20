@@ -61,19 +61,22 @@ class Communication:
   def create_socket(self):
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self.sock.bind(('', 0))
+    self.discovery_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    self.discovery_sock.bind(('', DISCOVERY_PORT))
 
   def discover_c2(self):
-    self.sock.settimeout(5)
-    self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # Enable broadcast
+    self.discovery_sock.settimeout(5)
+    self.discovery_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # Enable broadcast
 
 
     tries = 0
 
     while tries < 1000:
-      self.sock.sendto(DISCOVER_MESSAGE + RANDOM_ID, ('<broadcast>', DISCOVERY_PORT))
+      self.discovery_sock.sendto(DISCOVER_MESSAGE + RANDOM_ID, ('<broadcast>', DISCOVERY_PORT))
 
       try:
-        data, addr = self.sock.recvfrom(1024)
+        data, addr = self.discovery_sock.recvfrom(1024)
+        print(data)
         if data == RANDOM_ID:
           return addr[0]
       except socket.timeout:

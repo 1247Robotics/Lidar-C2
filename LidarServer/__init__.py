@@ -85,7 +85,7 @@ class Communication:
     self.operating_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self.operating_sock.bind(('', 0))
     self.discovery_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    self.discovery_sock.bind(('', 0))
+    self.discovery_sock.bind(('', DISCOVERY_PORT))
     
     
   def connect_to_c2s(self):
@@ -132,14 +132,18 @@ class Communication:
       while True:
           try:
             data, addr = self.discovery_sock.recvfrom(1024)
+            print(data, addr)
             if DISCOVER_MESSAGE in data:
+                print("found satilite")
                 self.satilites+= [Satilite(addr, data)]
                 satilite=self.satilites[-1]
                 self.discovery_sock.sendto(satilite.id, (satilite.address, DISCOVERY_PORT))
-                self.discovery_sock.bind(('', 0))
+                self.discovery_sock.bind(('', DISCOVERY_PORT))
   
           except socket.timeout:
             pass
+          except Exception as e:
+            print(e)
           
           for i, satilite in enumerate(self.satilites):
               for j, satilite2 in enumerate(self.satilites):
@@ -151,20 +155,24 @@ class Communication:
   def satilite_proccecing(self):
       
       while True:
-          for satilie in self.satilites:
-              self.operating_sock.bind((satilie.address, OPERATING_PORT))
-              rawData=sock.recv(4196)
-              data = satilite.checkData(rawData)
-              
-              if data ==None:
-                  self.request_resend(rawData["message_id"], satilite.address)
-              else:
-                  self.inboundQueue.put(data)
+          
+          
+          rawData, addr=self.operating_sock.recv(4196)
+          for satilite in self.satilites:
+              if satilite.address == addr:
+                  x=satilite
+                  break
+          data = x.checkData(rawData)
+          
+          if data ==None:
+              self.request_resend(rawData["message_id"], x.address)
+          else:
+              self.inboundQueue.put(data)
   
   
 class Satilite: 
     def __init__(self, addr, data):
-        self.address=addr
+        self.address=addr[0]
         self.id=data[len(DISCOVER_MESSAGE):]
 
     def checkData(self, data):
