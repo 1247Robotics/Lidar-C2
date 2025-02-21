@@ -132,9 +132,7 @@ class Communication:
       while True:
           try:
             data, addr = self.discovery_sock.recvfrom(1024)
-            print(data, addr)
             if DISCOVER_MESSAGE in data:
-                print("found satilite")
                 self.satilites+= [Satilite(addr, data)]
                 satilite=self.satilites[-1]
                 self.discovery_sock.sendto(satilite.id, (satilite.address, DISCOVERY_PORT))
