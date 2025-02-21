@@ -166,6 +166,8 @@ class Communication:
       if self.is_comms_command(payload):
         self.handle_comms_command(payload)
         continue
+      else:
+        print(payload)
 
       self.messageQueue.put(payload)
 
@@ -184,3 +186,4 @@ class Communication:
     return self.messageQueue.get_nowait()
     
 Communication()
+print("doing stuff")

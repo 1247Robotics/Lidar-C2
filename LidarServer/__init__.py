@@ -83,7 +83,7 @@ class Communication:
   
   def create_sockets(self):
     self.operating_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    self.operating_sock.bind(('', 0))
+    self.operating_sock.bind(('', OPERATING_PORT))
     self.discovery_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self.discovery_sock.bind(('', DISCOVERY_PORT))
     
@@ -109,7 +109,9 @@ class Communication:
       self.send_single_payload(payload)
       
   def send_single_payload(self, payload):
-    self.sock.bind(payload["address"], payload["port"])
+    x=(payload["address"], payload["port"])
+    print(x)
+    #self.operating_sock.bind()
 
     message_id = random_id()
     payload = json.dumps(payload)
@@ -124,7 +126,7 @@ class Communication:
 
     self.outboundCache[message_id] = payload
 
-    self.sock.send(data.encode())
+    self.operating_sock.sendto(data.encode(), x)
     
   def discover_satilites(self):
       self.discovery_sock.settimeout(5)
@@ -134,9 +136,9 @@ class Communication:
             data, addr = self.discovery_sock.recvfrom(1024)
             if DISCOVER_MESSAGE in data:
                 self.satilites+= [Satilite(addr, data)]
+                print("Created New Satilite")
                 satilite=self.satilites[-1]
                 self.discovery_sock.sendto(satilite.id, (satilite.address, DISCOVERY_PORT))
-                self.discovery_sock.bind(('', DISCOVERY_PORT))
   
           except socket.timeout:
             pass
@@ -296,4 +298,15 @@ class Satilite:
     '''
 
 
-Communication()
+c=Communication()
+while True:
+  while len(c.satilites)>0:
+    send=input("incert text to be sent here: ")
+    c.send_message({
+      "address":c.satilites[0].address,
+      "port":OPERATING_PORT,
+      "type": "message",
+      "command": send,
+      "message_id": "n/a"
+    })
+    
