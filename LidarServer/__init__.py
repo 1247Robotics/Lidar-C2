@@ -135,10 +135,17 @@ class Communication:
           try:
             data, addr = self.discovery_sock.recvfrom(1024)
             if DISCOVER_MESSAGE in data:
-                self.satilites+= [Satilite(addr, data)]
-                print("Created New Satilite")
-                satilite=self.satilites[-1]
-                self.discovery_sock.sendto(satilite.id, (satilite.address, DISCOVERY_PORT))
+				satilte=Satilite(addr, data)
+				found=False
+				for s in satilites:
+					if s.address==satilite.address:
+						found=True
+						break
+                if not found:
+					self.satilites+= [satilite]
+					print("Created New Satilite")
+				else:
+					self.discovery_sock.sendto(satilite.id, (satilite.address, DISCOVERY_PORT))
   
           except socket.timeout:
             pass
